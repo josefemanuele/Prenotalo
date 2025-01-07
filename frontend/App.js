@@ -25,6 +25,7 @@ export default function App() {
   let [ roleBool, setRoleBool ] = useState(false);
 
   user.setLoggedIn = setLoggedIn;
+  user.setRoleBool = setRoleBool;
   user.switchRole = () => {
     setRoleBool(!roleBool);
   };

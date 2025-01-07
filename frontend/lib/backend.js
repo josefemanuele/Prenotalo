@@ -1,3 +1,17 @@
+export function getUserByEmail(email) {
+	let tmp = users.filter(user => user.email === email);
+
+	if (tmp.length === 0) {
+		return null;
+	}
+
+	return tmp[0];
+}
+
+export function addUser() {
+	return true;
+}
+
 export function getOrganizations() {
 	return organizations;
 }
@@ -25,7 +39,31 @@ export function getEventsOfOrganization(org_id) {
 	return events.filter(event => event.organization_id === org_id);
 };
 
+export function addEvent(event_info) {
+	let maxId = events.reduce((acc, { id }) => Math.max(acc, id), 0) + 1;
+
+	event_info.id = maxId;
+
+	events.push(event_info);
+}
+
+export function modifyEvent(event_id, event_info) {
+	for (let i = 0; i < events.length; i++) {
+		if (events[i].id === event_id) {
+			events[i] = {
+				...events[i],
+				...event_info,
+			};
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
 export function removeEvent(event_id) {
+	reservations = reservations.filter(resv => resv.event_id !== event_id);
 	events = events.filter(event => event.id !== event_id);
 }
 
@@ -73,11 +111,15 @@ export function removeReservation(resv_id) {
 }
 
 export default {
+	getUserByEmail,
+
 	getOrganizations,
 	getOrganizationById,
 
 	getEventById,
 	getEventsOfOrganization,
+	addEvent,
+	modifyEvent,
 	removeEvent,
 
 	getReservationById,

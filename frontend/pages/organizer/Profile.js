@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Text, Divider, Icon } from 'react-native-paper';
 
-import { doRequest } from '../../lib/rest.js';
-
 import { ids as bsIds, styles as bsStyles } from '../../style/bootstrap.js';
 import style, { GLOBAL_SPACING } from '../../style/custom.js';
 
@@ -17,30 +15,6 @@ export default function Profile({ navigation, route }) {
 	description: 'Melody Events Group is a dynamic event planning organization dedicated to curating a diverse array of live music experiences that celebrate various genres and seasonal festivals',
 	});
   let [ refreshing, setRefreshing ] = useState(false);
-
-  async function doRefresh() {
-    setRefreshing(true);
-
-		let response;
-
-    try {
-      response = await doRequest('organization', 'GET', `/organization/${id}`, null);
-    } catch (e) {
-      // nothing
-    }
-
-    if (response != null) {
-      setorganizationInfo(response);
-    } else {
-      console.log('Error fetching organization')
-    }
-
-    setRefreshing(false);
-  }
-
-  // useEffect(() => {
-  //   doRefresh();
-  // }, []);
 
 	return (
 		<ScrollView contentContainerStyle={style.box} style={bsStyles.container} dataSet={{ media: bsIds.container }}>

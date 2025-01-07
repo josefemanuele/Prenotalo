@@ -45,7 +45,7 @@ export default function EventList({ navigation, route }) {
 		<>
 			<Text variant="headlineMedium" style={[ style.box, {
 				alignSelf: 'center', fontWeight: 'bold'
-			} ]}>{orgInfo.name}</Text>
+			} ]} onClick={doRefresh}>{orgInfo.name}</Text>
 
 			<ScrollView contentContainerStyle={style.box} refreshControl={
 				<RefreshControl refreshing={refreshing} onRefresh={doRefresh} />

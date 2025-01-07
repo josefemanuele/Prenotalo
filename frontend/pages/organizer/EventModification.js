@@ -9,19 +9,28 @@ import { DatePickerInput, TimePickerModal, it, registerTranslation } from 'react
 import FullDialog from '../../components/FullDialog.js';
 import LoadingOverlay from '../../components/LoadingOverlay.js';
 
+import backend from '../../lib/backend.js';
+
 import { ids as bsIds, styles as bsStyles } from '../../style/bootstrap.js';
 import style from '../../style/custom.js';
 
 let eventCategories = [
-	{ label: 'Unspecified', value: 'default' },
-	{ label: 'Categoria 1', value: 1 },
-	{ label: 'Categoria 2', value: 2 },
-	{ label: 'Categoria 3', value: 3 },
+	{ label: 'Unspecified', value: 'Unspecified' },
+	{ label: 'Concert', value: 'Concert' },
+	{ label: 'Culinary', value: 'Culinary' },
+	{ label: 'Exhibition', value: 'Exhibition' },
+	{ label: 'Festival', value: 'Festival' },
+	{ label: 'Fitness', value: 'Fitness' },
+	{ label: 'Holiday', value: 'Holiday' },
+	{ label: 'Performance', value: 'Performance' },
+	{ label: 'Workshop', value: 'Workshop' },
 ];
 
 registerTranslation('it', it);
 
 export default function EventCreation({ navigation, route }) {
+	let organizationId = 1;
+
 	let { event_info } = route.params || {};
 
 	let initDate;
@@ -29,11 +38,12 @@ export default function EventCreation({ navigation, route }) {
 	if (!event_info) {
 		event_info = {
 			"id": 0,
+			"organization_id": organizationId,
 			"name": '',
 			"date": undefined,
 			"start_time": null,
 			"end_time": null,
-			"category": 'default',
+			"category": 'Unspecified',
 			"location": '',
 			"price": 0,
 			"description": '',
@@ -63,6 +73,9 @@ export default function EventCreation({ navigation, route }) {
 
 	let [ dialogVisible, setDialogVisible ] = useState(false);
 	let [ loading, setLoading ] = useState(false);
+
+	let stOpenIcon = <TextInput.Icon icon='clock-edit-outline' onPress={() => setStVisible(true)} />;
+	let etOpenIcon = <TextInput.Icon icon='clock-edit-outline' onPress={() => setEtVisible(true)} />;
 
 	return (
 		<ScrollView contentContainerStyle={style.box} style={[ bsStyles.container ]} dataSet={{ media: bsIds.container }}>
@@ -101,11 +114,7 @@ export default function EventCreation({ navigation, route }) {
 				<TextInput
 					label="Start time"
 					value={formatTime(startTime)}
-					onFocus={(event) => {
-						console.log(event);
-						event.preventDefault();
-						setStVisible(true);
-					}}
+					right={stOpenIcon}
 					style={{ marginBottom: 20, marginRight: 20, flex: 1}}
 					disabled={loading}
 				/>
@@ -113,7 +122,7 @@ export default function EventCreation({ navigation, route }) {
 				<TextInput
 					label="End time"
 					value={formatTime(endTime)}
-					onFocus={() => setEtVisible(true)}
+					right={etOpenIcon}
 					style={{ marginBottom: 20, flex: 1 }}
 					disabled={loading}
 				/>
@@ -190,11 +199,27 @@ export default function EventCreation({ navigation, route }) {
 				onPress={() => {
 					setLoading(true);
 
+					let eventData = {
+						organization_id: organizationId,
+						name,
+						date: `${date.getDay()+1}/${date.getMonth() + 1}/${date.getFullYear()}`,
+						start_time: formatTime(startTime),
+						end_time: formatTime(endTime),
+						category,
+						location,
+						price,
+						description,
+						capacity: participantsNum,
+					}
+
+					if (event_info.id > 0) {
+						backend.modifyEvent(event_info.id, eventData);
+					} else {
+						backend.addEvent(eventData);
+					}
+
 					setTimeout(() => {
 						setLoading(false);
-
-						console.log(date);
-
 						setDialogVisible(true);
 					}, 1000);
 				}}
@@ -213,7 +238,7 @@ export default function EventCreation({ navigation, route }) {
 					name: 'OK',
 					callback: () => {
 						setDialogVisible(false);
-						navigation.pop();
+						navigation.popToTop();
 					}},
 				]}
 				visible={dialogVisible}
